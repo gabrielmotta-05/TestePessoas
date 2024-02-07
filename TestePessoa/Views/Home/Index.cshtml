@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@* FUNCIONANDO SEM CHAMAR CONTROLLER *@
+@* <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -216,6 +217,189 @@
 
             // Preencher a tabela novamente com os dados atualizados
             preencherTabela();
+        }
+
+        // Chamar a função para preencher a tabela quando a página carregar
+        document.addEventListener("DOMContentLoaded", preencherTabela);
+    </script>
+
+</body>
+</html>
+ *@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Cadastro de Pessoas</title>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <a class="btn btn-primary" href="@Url.Action("Criar", "Pessoa")">Novo</a>
+
+        <table class="table mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome Completo</th>
+                    <th>Data de Nascimento</th>
+                    <th>Valor da Renda</th>
+                    <th>CPF</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-pessoas">
+                <!-- Preencher a tabela com os dados da lista de pessoas -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para editar pessoa -->
+    <div class="modal fade" id="modalEditarPessoa" tabindex="-1" role="dialog" aria-labelledby="modalEditarPessoaLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarPessoaLabel">Editar Pessoa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Campos de formulário para editar pessoa -->
+                    <input type="hidden" id="editarId">
+                    <label for="editarNome">Nome Completo:</label>
+                    <input type="text" id="editarNome" class="form-control" required>
+
+                    <label for="editarDataNascimento">Data de Nascimento:</label>
+                    <input type="date" id="editarDataNascimento" class="form-control" required>
+
+                    <label for="editarRenda">Valor da Renda:</label>
+                    <input type="number" id="editarRenda" class="form-control" required>
+
+                    <label for="editarCpf">CPF:</label>
+                    <input type="text" id="editarCpf" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ... -->
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Exemplo de dados da lista de pessoas
+        var listaPessoas = [
+            // { id: 1, nome: "João Silva", dataNascimento: "1990-01-01", renda: 5000, cpf: "123.456.789-00" },
+            // { id: 2, nome: "Maria Souza", dataNascimento: "1985-05-10", renda: 6000, cpf: "987.654.321-00" }
+            // Adicione mais pessoas conforme necessário
+        ];
+
+        // Função para preencher a tabela com os dados da lista de pessoas
+        function preencherTabela() {
+            var tabela = document.getElementById("tabela-pessoas");
+
+            // Limpa o conteúdo atual da tabela
+            tabela.innerHTML = "";
+
+            listaPessoas.forEach(function (pessoa) {
+                var linha = tabela.insertRow();
+                linha.insertCell(0).innerText = pessoa.id;
+                linha.insertCell(1).innerText = pessoa.nome;
+                linha.insertCell(2).innerText = pessoa.dataNascimento;
+                linha.insertCell(3).innerText = pessoa.renda;
+                linha.insertCell(4).innerText = pessoa.cpf;
+
+                // Adiciona botão "Editar"
+                var botaoEditar = document.createElement("button");
+                botaoEditar.className = "btn btn-warning mr-2";
+                botaoEditar.innerText = "Editar";
+                botaoEditar.addEventListener("click", function () {
+                    abrirModalEditar(pessoa);
+                });
+
+                // Adiciona botão "Excluir"
+                var botaoExcluir = document.createElement("button");
+                botaoExcluir.className = "btn btn-danger";
+                botaoExcluir.innerText = "Excluir";
+                botaoExcluir.addEventListener("click", function () {
+                    excluirPessoa(pessoa.id);
+                });
+
+                // Cria um div para envolver os botões "Editar" e "Excluir"
+                var divBotoes = document.createElement("div");
+                divBotoes.className = "btn-group";
+                divBotoes.appendChild(botaoEditar);
+                divBotoes.appendChild(botaoExcluir);
+
+                linha.insertCell(5).appendChild(divBotoes);
+            });
+        }
+
+        // Função para abrir o modal de edição
+        function abrirModalEditar(pessoa) {
+            document.getElementById("editarId").value = pessoa.id;
+            document.getElementById("editarNome").value = pessoa.nome;
+            document.getElementById("editarDataNascimento").value = pessoa.dataNascimento;
+            document.getElementById("editarRenda").value = pessoa.renda;
+            document.getElementById("editarCpf").value = pessoa.cpf;
+
+            // Abrir o modal de edição
+            $('#modalEditarPessoa').modal('show');
+        }
+
+        // Função para salvar a edição
+        function salvarEdicao() {
+            var id = document.getElementById("editarId").value;
+            var nome = document.getElementById("editarNome").value;
+            var dataNascimento = document.getElementById("editarDataNascimento").value;
+            var renda = document.getElementById("editarRenda").value;
+            var cpf = document.getElementById("editarCpf").value;
+
+            // Enviar requisição para o controller para salvar a edição
+            $.ajax({
+                url: '/Pessoa/Editar',
+                type: 'POST',
+                data: {
+                    id: id,
+                    nome: nome,
+                    dataNascimento: dataNascimento,
+                    renda: renda,
+                    cpf: cpf
+                },
+                success: function (response) {
+                    // Atualizar a tabela após a edição ser realizada
+                    preencherTabela();
+
+                    // Fechar o modal de edição
+                    $('#modalEditarPessoa').modal('hide');
+                }
+            });
+        }
+
+        // Função para excluir uma pessoa da lista
+        function excluirPessoa(id) {
+            // Confirmar a exclusão antes de prosseguir
+            if (confirm("Deseja realmente excluir esta pessoa?")) {
+                // Enviar requisição para o controller para excluir a pessoa
+                $.ajax({
+                    url: '/Pessoa/Excluir',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        // Atualizar a tabela após a exclusão ser realizada
+                        preencherTabela();
+                    }
+                });
+            }
         }
 
         // Chamar a função para preencher a tabela quando a página carregar
